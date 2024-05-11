@@ -8,6 +8,7 @@ interface EditExpenseFormProps {
     totalExpense?: string,
     date?: string,
     expenseType?: string,
+    expenseId?: string,
 }
 const EditExpenseForm: React.FC<EditExpenseFormProps> = (props: any) => {
     
@@ -19,7 +20,23 @@ const EditExpenseForm: React.FC<EditExpenseFormProps> = (props: any) => {
     console.log(props)
     const saveChanges=async()=>{
         console.log('save changes')
-        console.log(project,site,totalExpense,date,expenseType)
+        // console.log(project,site,totalExpense,date,expenseType,props.route.params.expenseId)
+        const respose =await fetch("https://9f3a-103-194-71-218.ngrok-free.app/api/expense",{
+            method:"PATCH",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                project:project,
+                site:site,
+                totalExpense:totalExpense,
+                Date:date,
+                Expense_Type:expenseType,
+                expenseId:props.route.params.expenseId
+            })
+        })
+        const data=await respose.json();
+        console.log(data)
         
     }
     return (

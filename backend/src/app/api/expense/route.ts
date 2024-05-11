@@ -9,7 +9,6 @@ export async function GET() {
     data: response,
   })
 }
-
 interface Data {
     userId?: string;
     project: string;

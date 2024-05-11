@@ -1,181 +1,207 @@
+import React, { useState, useEffect } from 'react';
 import { Button, Divider, Text } from "@rneui/base";
 import { useNavigation } from "@react-navigation/native";
-import { TouchableOpacity, View,Dimensions, ScrollView } from "react-native";
+import { TouchableOpacity, View, Dimensions, ScrollView, Modal, StyleSheet, Pressable, Alert } from "react-native";
 import { Card } from '@rneui/themed';
-import { useState } from "react";
 import { Box } from "../Structures/Box";
 import { AntDesign, Feather } from "@expo/vector-icons";
+// import GetAllExpenses from "../../../backend/src/server/expenses"
 interface DummyData {
     project: string,
     site: string,
     totalExpense: Number,
     Date: string,
     Expense_Type: string,
+    id?: string,
 }
-export default function DashBoard (){
+
+export default function DashBoard() {
     const navigation = useNavigation();
-    var {width, height} = Dimensions.get('window')
+    var { width, height } = Dimensions.get('window');
     const [touched, setTouched] = useState({
         state: false,
         id: "",
     });
-    const dummyData:[DummyData]=[
-        {
-          project: "Jindal Steel",
-          site: "Angul",
-          totalExpense: 10000,
-          Date: "12/12/2021",
-          Expense_Type: "Labour",
-        },
-        {
-          project: "XYZ Corporation",
-          site: "New York",
-          totalExpense: 7500,
-          Date: "05/25/2022",
-          Expense_Type: "Materials",
-        },
-        {
-          project: "ABC Construction",
-          site: "Los Angeles",
-          totalExpense: 8500,
-          Date: "09/10/2023",
-          Expense_Type: "Equipment",
-        },
-        {
-          project: "Tech Innovations",
-          site: "San Francisco",
-          totalExpense: 12000,
-          Date: "03/15/2024",
-          Expense_Type: "Miscellaneous",
-        },
-        {
-          project: "Global Solutions",
-          site: "London",
-          totalExpense: 9200,
-          Date: "11/02/2022",
-          Expense_Type: "Transportation",
-        },
-        {
-          project: "Future Builders",
-          site: "Tokyo",
-          totalExpense: 11000,
-          Date: "07/20/2023",
-          Expense_Type: "Labour",
-        },
-        {
-          project: "Sunrise Contractors",
-          site: "Sydney",
-          totalExpense: 8800,
-          Date: "08/05/2022",
-          Expense_Type: "Materials",
-        },
-        {
-          project: "Ocean Builders",
-          site: "Mumbai",
-          totalExpense: 9500,
-          Date: "06/30/2023",
-          Expense_Type: "Equipment",
-        },
-        {
-          project: "Sky High Ventures",
-          site: "Dubai",
-          totalExpense: 10500,
-          Date: "04/18/2024",
-          Expense_Type: "Labour",
-        },
-        {
-          project: "Space Constructions",
-          site: "Moscow",
-          totalExpense: 8300,
-          Date: "02/08/2023",
-          Expense_Type: "Miscellaneous",
-        }
-      ];
-      
+    const [modalVisible, setModalVisible] = useState(false);
+    const [dummyData, setDummyData] = useState<DummyData[]>([]);
 
+    useEffect(() => {
+        const fetchExpenses = async () => {
+            try {
+                // const res2=await GetAllExpenses();
+                // console.log(res2)
+                const res = await fetch("https://9f3a-103-194-71-218.ngrok-free.app/api/expense", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+                const data = await res.json();
+                setDummyData(data.data);
+            } catch (error) {
+                console.error("Error fetching expenses:", error);
+            }
+        };
+        fetchExpenses();
+    }, [touched, navigation]);
 
-    return (<>
-  
-     
-      
-   <View style={{flex: 1}}>
-    <View style={{width: width, height: height - 200}}>
-    <Button onPress={()=>{
-        navigation.navigate("Home")
-      }}
-      >
-        Go to Home  Page
-      </Button>
-      <ScrollView>
-      {
-        dummyData.map((data,index)=>{
-            return(
-                <Box>
-                <Box
-					flexDirection="row"
-					justifyContent="space-between"
-					alignItems="center"
-				>
-
-                </Box>
-                <TouchableOpacity
-                onPress={()=>{
-                    setTouched({
-                        state: !touched.state,
-                        id: index.toFixed(),
-                    });
-                }}
-                >
-                <Card key={index}>
-                    <Text>{data.project}</Text>
-                    <Text>{data.site}</Text>
-                    <Text>{data.totalExpense}</Text>
-                    <Text>{data.Date}</Text>
-                    <Text>{data.Expense_Type}</Text>
-                </Card>
-                </TouchableOpacity>
-                </Box>
-            )
-        
+    const deleteExpense = () => {
+        fetch("https://9f3a-103-194-71-218.ngrok-free.app/api/expense", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                expenseId: dummyData[parseInt(touched.id)].id
+            })
         })
-       }
-      </ScrollView>
-      
-    </View>
-    <View>       
-    </View>
-    {touched.state && (
-				<>
-					<Box >
-						<Divider />
-					</Box>
-					<Box
-						flexDirection="row"
-						justifyContent="space-between"
-						alignItems="center"
-					>
-<Button
-    onPress={() => {
-        navigation.navigate("EditExpense", {
-            project: dummyData[touched.id as unknown as number].project,
-            site: dummyData[touched.id as unknown as number].site,
-            totalExpense: dummyData[touched.id as unknown as number].totalExpense.toString(),
-            date: dummyData[touched.id as unknown as number].Date,
-            expenseType: dummyData[touched.id as unknown as number].Expense_Type,
-        } as { project: string; site: string; totalExpense: string; date: string; expenseType: string });
-    }}
->
-    <Feather name="edit-2" size={24} color="white" />
-</Button>
-						<Button style={{ backgroundColor: "red" }} 
-                        // onPress=
-                        // {deleteButton}
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data);
+                setModalVisible(false);
+            })
+            .catch((error) => {
+                console.error("Error deleting expense:", error);
+            });
+        setModalVisible(false);
+    };
+
+    return (
+        <>
+            <View style={{ flex: 1 }}>
+                <View style={{ width: width, height: height - 200 }}>
+                    <Button onPress={() => navigation.navigate("Home")}>
+                        Go to Home Page
+                    </Button>
+                    <ScrollView>
+                        {dummyData.map((data, index) => (
+                            <Box key={index}>
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        setTouched({
+                                            state: !touched.state,
+                                            id: index.toString(),
+                                        });
+                                    }}
+                                >
+                                    <Card>
+                                        <Text>{data.id}</Text>
+                                        <Text>{data.project}</Text>
+                                        <Text>{data.site}</Text>
+                                        <Text>{data.totalExpense}</Text>
+                                        <Text>{data.Date}</Text>
+                                        <Text>{data.Expense_Type}</Text>
+                                    </Card>
+                                </TouchableOpacity>
+                            </Box>
+                        ))}
+                    </ScrollView>
+                </View>
+                {touched.state && (
+                    <>
+                        <Box>
+                            <Divider />
+                        </Box>
+                        <Box
+                            flexDirection="row"
+                            justifyContent="space-between"
+                            alignItems="center"
                         >
-							<AntDesign name="delete" size={24} color="white" />
-						</Button>
-					</Box>
-				</>
-			)}
-</View>
-    </>)
+                            <Button
+                                onPress={() => {
+                                    navigation.navigate("EditExpense", {
+                                        project: dummyData[parseInt(touched.id)].project,
+                                        expenseId: dummyData[parseInt(touched.id)].id,
+                                        site: dummyData[parseInt(touched.id)].site,
+                                        totalExpense: dummyData[parseInt(touched.id)].totalExpense.toString(),
+                                        date: dummyData[parseInt(touched.id)].Date,
+                                        expenseType: dummyData[parseInt(touched.id)].Expense_Type,
+                                    });
+                                }}
+                            >
+                                <Feather name="edit-2" size={24} color="white" />
+                            </Button>
+                            <Button
+                                style={{ backgroundColor: "red" }}
+                                onPress={() => setModalVisible(true)}
+                            >
+                                <AntDesign name="delete" size={24} color="white" />
+                            </Button>
+                        </Box>
+                    </>
+                )}
+            </View>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Are you sure you want to delete?</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Pressable
+                                style={[styles.button, styles.buttonClose]}
+                                onPress={() => setModalVisible(false)}
+                            >
+                                <Text style={styles.textStyle}>Cancel</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[styles.button, styles.buttonOpen]}
+                                onPress={deleteExpense}
+                            >
+                                <Text style={styles.textStyle}>Delete</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+        </>
+    );
 }
+
+const styles = StyleSheet.create({
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    button: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+        margin: 5,
+    },
+    buttonOpen: {
+        backgroundColor: '#2196F3',
+    },
+    buttonClose: {
+        backgroundColor: '#F194FF',
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
+    },
+});
