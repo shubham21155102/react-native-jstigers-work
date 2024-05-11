@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://shubham:shubham@localhost:5432/expensetracker_js_tigers"
+}
+
+model User {
+  id String @id @default(uuid())
+  name String
+  email String? @unique
+  hashedPassword String?
+  expenses Expense[]
+}
+
+model Expense {
+  id String @id @default(uuid())
+  project String
+  site String
+  totalExpense String
+  Date String
+  Expense_Type String
+  user User @relation(fields: [userId], references: [id])
+  userId String
+}
