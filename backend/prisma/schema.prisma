@@ -2,7 +2,6 @@ generator client {
   provider = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
 }
-
 datasource db {
   provider = "postgresql"
   url      = "postgresql://shubham:shubham@localhost:5432/expensetracker_js_tigers"
