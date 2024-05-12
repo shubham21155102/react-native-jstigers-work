@@ -5,7 +5,6 @@ import { TouchableOpacity, View, Dimensions, ScrollView, Modal, StyleSheet, Pres
 import { Card } from '@rneui/themed';
 import { Box } from "../Structures/Box";
 import { AntDesign, Feather } from "@expo/vector-icons";
-// import GetAllExpenses from "../../../backend/src/server/expenses"
 interface DummyData {
     project: string,
     site: string,
@@ -30,7 +29,7 @@ export default function DashBoard() {
             try {
                 // const res2=await GetAllExpenses();
                 // console.log(res2)
-                const res = await fetch("https://9f3a-103-194-71-218.ngrok-free.app/api/expense", {
+                const res = await fetch("https://shiner-enjoyed-stinkbug.ngrok-free.app/api/expense", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -46,7 +45,7 @@ export default function DashBoard() {
     }, [touched, navigation]);
 
     const deleteExpense = () => {
-        fetch("https://9f3a-103-194-71-218.ngrok-free.app/api/expense", {
+        fetch("https://shiner-enjoyed-stinkbug.ngrok-free.app/api/expense", {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json"
@@ -73,25 +72,51 @@ export default function DashBoard() {
                     <Button onPress={() => navigation.navigate("Home")}>
                         Go to Home Page
                     </Button>
-                    <ScrollView>
+                    <ScrollView
+                   
+                    >
                         {dummyData.map((data, index) => (
-                            <Box key={index}>
+                            <Box key={index}
+                            
+                            >
                                 <TouchableOpacity
                                     onPress={() => {
                                         setTouched({
                                             state: !touched.state,
                                             id: index.toString(),
                                         });
+
                                     }}
+                                    style={{backgroundColor: touched.id === index.toString() ? "#449B2614" : "white",
+                                    shadowColor: '#101010',
+                                    shadowOffset: { width: 0, height: 4 },
+                                    shadowOpacity: 0.15,
+                                    shadowRadius: 8,
+                                    // elevation: 5,
+           
+                                 
+                                    borderBottomWidth: 1,
+                                    borderBottomColor: 'rgba(217, 217, 217, 1)'
+                                    }}
+                                    
                                 >
-                                    <Card>
-                                        <Text>{data.id}</Text>
+                                
+
+                                    
+                                
+                                    <View
+                                    
+                                    >
+                                    {/* <Text>{data.id}</Text> */}
                                         <Text>{data.project}</Text>
                                         <Text>{data.site}</Text>
                                         <Text>{data.totalExpense}</Text>
                                         <Text>{data.Date}</Text>
                                         <Text>{data.Expense_Type}</Text>
-                                    </Card>
+                                    </View>
+                                    <Divider/>
+                                        
+                                    
                                 </TouchableOpacity>
                             </Box>
                         ))}

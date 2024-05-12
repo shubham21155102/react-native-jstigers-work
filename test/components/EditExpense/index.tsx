@@ -21,7 +21,7 @@ const EditExpenseForm: React.FC<EditExpenseFormProps> = (props: any) => {
     const saveChanges=async()=>{
         console.log('save changes')
         // console.log(project,site,totalExpense,date,expenseType,props.route.params.expenseId)
-        const respose =await fetch("https://9f3a-103-194-71-218.ngrok-free.app/api/expense",{
+        const respose =await fetch("https://shiner-enjoyed-stinkbug.ngrok-free.app/api/expense",{
             method:"PATCH",
             headers:{
                 "Content-Type":"application/json"
@@ -37,7 +37,6 @@ const EditExpenseForm: React.FC<EditExpenseFormProps> = (props: any) => {
         })
         const data=await respose.json();
         console.log(data)
-        
     }
     return (
         <>
